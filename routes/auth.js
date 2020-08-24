@@ -16,8 +16,11 @@ router.post('/logout',authController.postLogout);
 router.post('/login',[
     body('email')
         .isEmail()
-        .withMessage('Please Enter a valid email'),
-    body('password','Please Enter valid password').isLength({min: 5})
+        .withMessage('Please Enter a valid email')
+        .normalizeEmail(),
+    body('password','Please Enter valid password')
+    .isLength({min: 5})
+    .trim()
         
 ],
 authController.postLogin);
@@ -41,11 +44,14 @@ router.post(
             );
           }
         });
-      }),
-    body("password", "Please Enter password atleast 5 characters").isLength({
-      min: 5,
-    }),
-    body("confirmPassword").custom((value, { req }) => {
+      })
+      .normalizeEmail(),
+    body("password", "Please Enter password atleast 5 characters")
+    .isLength({min: 5,})
+    .trim(),
+    body("confirmPassword")
+    .trim()
+    .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Password dont match");
       }
